@@ -3,6 +3,10 @@ import tiktoken
 import json
 from bs4 import BeautifulSoup
 
+# ==========================================
+# 1. FUNCTION DEFINITIONS (The Tools)
+# ==========================================
+
 def scrape_hunter_page(url):
     # Fetch the HTML content
     headers = {
@@ -35,19 +39,6 @@ def scrape_hunter_page(url):
 
     return clean_text
 
-# Define your target
-test_url = "https://www.hunter.cuny.edu/students/registration/academic-calendar/"
-extracted_text = scrape_hunter_page(test_url)
-
-print(f"Extracted {len(extracted_text)} characters.")
-print("-" * 40)
-print(extracted_text[:500]) # Preview the first 500 characters
-
-with open('calendar_full_text.txt', 'w', encoding='utf-8') as f:
-    f.write(extracted_text)
-
-print("Saved the entire page to calendar_full_text.txt!")
-
 def chunk_text(text, max_tokens=200, overlap=25):
     # Initialize the tokenizer (cl100k_base is standard for modern LLMs)
     encoding = tiktoken.get_encoding("cl100k_base")
@@ -72,35 +63,51 @@ def chunk_text(text, max_tokens=200, overlap=25):
         
     return chunks
 
-# Execute Chunking
-document_chunks = chunk_text(extracted_text, max_tokens=200, overlap=25)
+# ==========================================
+# 2. BATCH EXECUTION (The Action)
+# ==========================================
 
-print("\n--- CHUNKING RESULT ---")
-print(f"Created {len(document_chunks)} discrete chunks.")
-print("-" * 40)
-print("Preview of Chunk 1:")
-print(document_chunks[0])
-print("-" * 40)
-print("Preview of Chunk 2:")
-print(document_chunks[1])
+# Define your master list of knowledge areas
+target_urls = [
+    "https://www.hunter.cuny.edu/students/registration/academic-calendar/",
+    "https://hunter.cuny.edu/students/financial-aid/", 
+    "https://www.hunter.cuny.edu/academics/departments-and-programs/"
+]
 
-def export_to_json(chunks, source_url, output_filename="campus_data.json"):
-    # Create a list of dictionaries (structured data)
-    structured_data = []
+all_structured_data = []
+global_chunk_id = 0
+
+print("Starting HawkAI Batch Scrape...")
+print("-" * 40)
+
+# Loop through every URL in our list
+for url in target_urls:
+    print(f"Scraping: {url}")
+    try:
+        # Extract and clean the text
+        extracted_text = scrape_hunter_page(url)
+        
+        # Chop it into 200-token chunks with 25-token overlap
+        chunks = chunk_text(extracted_text, max_tokens=200, overlap=25)
+        
+        # Format each chunk for the database
+        for chunk in chunks:
+            document = {
+                "chunk_id": f"hawk_{global_chunk_id}",
+                "source_url": url,
+                "text": chunk
+            }
+            all_structured_data.append(document)
+            global_chunk_id += 1
+            
+        print(f"  -> Success! Created {len(chunks)} chunks.")
+    except Exception as e:
+        print(f"  -> FAILED: {e}")
+
+# Export everything into one master database file
+output_filename = "campus_data.json"
+with open(output_filename, 'w', encoding='utf-8') as f:
+    json.dump(all_structured_data, f, indent=4, ensure_ascii=False)
     
-    for index, chunk in enumerate(chunks):
-        document = {
-            "chunk_id": f"cal_{index}",
-            "source_url": source_url,
-            "text": chunk
-        }
-        structured_data.append(document)
-        
-    # Write to a JSON file
-    with open(output_filename, 'w', encoding='utf-8') as f:
-        json.dump(structured_data, f, indent=4, ensure_ascii=False)
-        
-    print(f"\nSuccessfully exported {len(chunks)} chunks to {output_filename}!")
-
-# Execute Step 3
-export_to_json(document_chunks, test_url)
+print("-" * 40)
+print(f"Batch complete! Exported {len(all_structured_data)} total chunks to {output_filename}.")

@@ -56,10 +56,10 @@ def generate_campus_answer(user_question, retrieved_context):
 
 # --- Test the Implementation ---
 simulated_retrieved_chunk = """
-8/5 Wednesday Withdrawal (W) period ends 8/19 Wednesday Last day of 5-Weeks classes Grade rosters available to faculty 8/21 Thursday Deadline to submit final grade rosters Upcoming Fall 2026 The Academic Calendar is subject to change at any time by official action of the University. 4/7 Tuesday Fall 2026 shopping cart opens in Schedule Builder 4/20 Monday Priority registration begins 4/21 Tuesday Continuing Doctoral and Graduate registration begins
+Hunter College Academics | Departments and Programs. The School of Arts and Sciences offers over 70 undergraduate programs. The Computer Science department (CSCI) offers a BA and an MA program, focusing on software engineering, data science, and artificial intelligence. The main department office is located on the 10th floor of the North Building. For academic advising in the School of Education, students must schedule an appointment through Navigate.
 """
 
-test_question = "When does the Fall 2026 shopping cart open?"
+test_question = "What degrees does the Computer Science department offer?"
 
 print("Asking HawkAI (via Modern Free Gemini API)...")
 answer = generate_campus_answer(test_question, simulated_retrieved_chunk)
