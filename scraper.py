@@ -15,8 +15,12 @@ ENCODING = tiktoken.get_encoding("cl100k_base")
 # Full scrape: run twice per semester (start + midpoint)
 # Covers all Hunter Financial Aid content domains from the proposal
 FULL_SCRAPE_URLS = [
-    "https://www.hunter.cuny.edu/students/financial-aid/",              # Deadlines, announcements, office hours
-    "https://www.hunter.cuny.edu/students/financial-aid/faq",          # Pre-built Q&A pairs
+    "https://www.hunter.cuny.edu/students/financial-aid/",                            # Deadlines, announcements, office hours
+    "https://www.hunter.cuny.edu/students/financial-aid/faq",                         # Pre-built Q&A pairs
+    "https://www.hunter.cuny.edu/students/financial-aid/financial-aid-eligibility/",  # Eligibility criteria and requirements
+    "https://www.hunter.cuny.edu/students/financial-aid/financial-aid-types/",        # Types of aid
+    "https://www.hunter.cuny.edu/students/financial-aid/apply-for-financial-aid/",     # Application process and instructions
+    "https://www.hunter.cuny.edu/students/financial-aid/office-of-financial-aid/"     # Office contact info, hours, and location
 ]
 
 # Lightweight scrape: run monthly — deadlines change more frequently than other content
